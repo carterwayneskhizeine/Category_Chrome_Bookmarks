@@ -9,6 +9,7 @@ import re
 from html.parser import HTMLParser
 from collections import defaultdict
 import os
+from config import Config
 
 
 class BookmarkParser(HTMLParser):
@@ -328,7 +329,7 @@ class HTMLGenerator:
 '''
 
         # 写入文件
-        with open(output_file, 'w', encoding='utf-8') as f:
+        with open(output_file, 'w', encoding=Config.ENCODING) as f:
             f.write(html_content)
 
     @staticmethod
@@ -509,28 +510,28 @@ class HTMLGenerator:
 </html>
 '''
 
-        with open(output_file, 'w', encoding='utf-8') as f:
+        with open(output_file, 'w', encoding=Config.ENCODING) as f:
             f.write(html_content)
 
 
 def main():
     """主函数"""
-    # 输入文件路径
-    input_file = r'D:\Code\bookmarks\bookmarks25.html'
-    output_dir = r'D:\Code\bookmarks\classified'
+    # 使用配置文件中的路径
+    input_file = Config.INPUT_FILE
+    output_dir = Config.OUTPUT_DIR
 
-    # 创建输出目录
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    # 确保输出目录存在
+    Config.ensure_output_dir()
 
+    # 显示应用信息
     print("=" * 60)
-    print("Chrome Bookmark Classifier - Chrome书签智能分类工具")
+    print(Config.get_app_info())
     print("=" * 60)
     print()
 
     # 读取并解析HTML文件
-    print(f"[1/4] 正在读取书签文件: {input_file}")
-    with open(input_file, 'r', encoding='utf-8') as f:
+    print(f"[1/4] 正在读取书签文件: {Config.get_input_file_display()}")
+    with open(input_file, 'r', encoding=Config.ENCODING) as f:
         html_content = f.read()
 
     # 解析书签
@@ -578,7 +579,7 @@ def main():
 
     print("=" * 60)
     print("[OK] 完成！所有文件已生成到:")
-    print(f"  {output_dir}")
+    print(f"  {Config.get_output_dir_display()}")
     print()
     print("请打开 index.html 浏览你的书签分类")
     print("=" * 60)

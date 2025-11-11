@@ -56,7 +56,7 @@ folder_name: str          # 当前文件夹名称
 ```python
 from bookmark_classifier import BookmarkParser
 
-with open('bookmarks25.html', 'r', encoding='utf-8') as f:
+with open('bookmarks.html', 'r', encoding='utf-8') as f:
     html_content = f.read()
 
 parser = BookmarkParser()
@@ -563,6 +563,65 @@ def generate_report(classified):
 - 文件夹关键词匹配过于复杂
 - 分类准确性有待提高
 
+## 配置管理
+
+### config.py 配置系统
+
+v2.0版本引入了独立的配置文件系统，将所有硬编码的参数分离出来：
+
+```python
+class Config:
+    # 核心路径配置
+    INPUT_FILE = r'D:\Code\bookmarks\bookmarks25.html'
+    OUTPUT_DIR = r'D:\Code\bookmarks\classified'
+
+    # 系统配置
+    ENCODING = 'utf-8'
+
+    # 应用信息
+    APP_NAME = "Chrome Bookmark Classifier"
+    APP_VERSION = "v2.0"
+    APP_DESCRIPTION = "Chrome书签智能分类工具"
+```
+
+### 配置方法
+
+- `ensure_output_dir()`: 确保输出目录存在
+- `get_app_info()`: 获取应用显示信息
+- `get_input_file_display()`: 获取输入文件显示路径
+- `get_output_dir_display()`: 获取输出目录显示路径
+
+### main() 函数配置化
+
+```python
+def main():
+    """主函数"""
+    # 使用配置文件中的路径
+    input_file = Config.INPUT_FILE
+    output_dir = Config.OUTPUT_DIR
+
+    # 确保输出目录存在
+    Config.ensure_output_dir()
+
+    # 显示应用信息
+    print("=" * 60)
+    print(Config.get_app_info())
+    print("=" * 60)
+
+    # 使用配置的编码
+    with open(input_file, 'r', encoding=Config.ENCODING) as f:
+        html_content = f.read()
+```
+
+### 配置优势
+
+1. **集中管理**: 所有配置在一个地方，避免硬编码
+2. **易于修改**: 不需要修改主代码文件，只需修改配置类
+3. **类型安全**: 使用类属性，避免字符串错误
+4. **可扩展**: 可以轻松添加新的配置项
+5. **路径处理**: 使用原始字符串避免转义字符问题
+6. **编码统一**: 统一使用配置中的编码设置
+
 ## 总结
 
 该脚本提供了一个完整的书签处理解决方案，包括:
@@ -570,5 +629,7 @@ def generate_report(classified):
 - 简化而准确的分类系统
 - 完全Chrome兼容的HTML生成
 - 易于扩展的架构
+- **独立配置系统** (v2.0新增)
+- **优化的文件名处理** (v2.0新增)
 
-v2.0版本通过移除复杂功能和改进Chrome兼容性，使工具更加实用和可靠。可根据需要进行定制和扩展，以满足更复杂的需求。
+v2.0版本通过移除复杂功能、改进Chrome兼容性和引入配置系统，使工具更加实用、可靠和易于维护。可根据需要进行定制和扩展，以满足更复杂的需求。

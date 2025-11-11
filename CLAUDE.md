@@ -6,7 +6,7 @@
 
 ## 核心贡献
 
-### 🎯 v2.0 重大版本升级 - Chrome兼容性修复
+### 🎯 v2.0 重大版本升级 - Chrome兼容性修复与系统重构
 
 **问题背景**: 用户反馈书签文件无法导入Chrome浏览器，只能导入其中一个链接
 
@@ -48,7 +48,39 @@ def classify_bookmark(self, bookmark):
     # 简化评分系统，统一权重为1
 ```
 
-#### 3. 修复Chrome导入兼容性
+#### 3. 引入配置系统重构
+**文件**: `config.py` (新增)
+```python
+class Config:
+    # 集中管理所有配置参数
+    INPUT_FILE = r'D:\Code\bookmarks\bookmarks.html'
+    OUTPUT_DIR = r'D:\Code\bookmarks\classified'
+    ENCODING = 'utf-8'
+    APP_NAME = "Chrome Bookmark Classifier"
+    APP_VERSION = "v2.0"
+    APP_DESCRIPTION = "Chrome书签智能分类工具"
+```
+
+#### 4. 重构main函数
+```python
+def main():
+    """主函数"""
+    # 使用配置文件中的路径
+    input_file = Config.INPUT_FILE
+    output_dir = Config.OUTPUT_DIR
+
+    # 确保输出目录存在
+    Config.ensure_output_dir()
+
+    # 使用配置的应用信息
+    print(Config.get_app_info())
+
+    # 统一使用配置的编码
+    with open(input_file, 'r', encoding=Config.ENCODING) as f:
+        html_content = f.read()
+```
+
+#### 5. 修复Chrome导入兼容性
 **文件**: `bookmark_classifier.py` (第182-214行)
 ```python
 # 直接列出所有书签（不包含ICON以避免Chrome导入问题）
@@ -118,6 +150,67 @@ for bookmark in bookmarks:
 3. **属性要求**: `ADD_DATE` 和 `LAST_MODIFIED` 时间戳
 4. **结束标签**: 必须以 `</DL><p>` 结尾
 5. **编码问题**: 长的base64 ICON数据导致解析失败
+
+### 🛠️ 配置系统重构 (v2.0新增)
+
+为了提高可维护性，引入了独立的配置系统：
+
+#### 配置类设计
+```python
+class Config:
+    # 核心路径配置
+    INPUT_FILE = r'D:\Code\bookmarks\bookmarks.html'
+    OUTPUT_DIR = r'D:\Code\bookmarks\classified'
+
+    # 系统配置
+    ENCODING = 'utf-8'
+
+    # 应用信息
+    APP_NAME = "Chrome Bookmark Classifier"
+    APP_VERSION = "v2.0"
+    APP_DESCRIPTION = "Chrome书签智能分类工具"
+```
+
+#### 配置优势
+1. **集中管理**: 避免硬编码，所有配置统一管理
+2. **类型安全**: 使用类属性替代字符串常量
+3. **易于维护**: 不需要修改核心逻辑代码
+4. **可扩展性**: 方便添加新的配置项
+5. **路径处理**: 使用原始字符串避免转义问题
+
+#### 配置方法
+- `ensure_output_dir()`: 自动创建输出目录
+- `get_app_info()`: 格式化应用信息显示
+- `get_input_file_display()`: 输入文件路径显示
+- `get_output_dir_display()`: 输出目录路径显示
+
+### 🧹 文件名安全处理 (v2.0新增)
+
+解决了特殊字符在文件名中的问题：
+
+#### 问题场景
+- 分类名 `AI/ML` → 文件名 `ai_ml.html`
+- 分类名 `Jobs & Career` → 文件名 `jobs__and__career.html`
+- 分类名 `Unreal Engine & Game Dev` → 文件名 `unreal_engine__and__game_dev.html`
+
+#### 解决方案
+```python
+# 安全文件名转换
+safe_filename = category_name.lower().replace(' ', '_').replace('/', '_').replace('&', '_and_')
+```
+
+#### 处理的特殊字符
+- ` ` → `_` (斜杠替换)
+- `&` → `_and_` (and符号替换)
+- ` ` → `_` (空格替换)
+
+### 🔄 一致性保证
+
+确保HTML生成和索引文件使用相同的文件名转换逻辑：
+```python
+# 在generate_category_html和generate_index_html中使用相同转换
+safe_filename = category_name.lower().replace(' ', '_').replace('/', '_').replace('&', '_and_')
+```
 
 ### 🛠️ 问题解决方法论
 

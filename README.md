@@ -108,6 +108,63 @@ CATEGORIES = {
 
 **注意**: 新版本已移除文件夹关键词匹配，分类仅基于URL和书签名称进行关键词匹配。
 
+## 配置管理
+
+### config.py 配置文件
+
+项目现在使用独立的配置文件 `config.py` 来管理路径和参数：
+
+```python
+class Config:
+    # 输入文件路径 - 修改这里来改变要处理的Chrome书签文件
+    INPUT_FILE = r'D:\Code\bookmarks\bookmarks25.html'
+
+    # 输出目录 - 修改这里来改变生成HTML文件的保存位置
+    OUTPUT_DIR = r'D:\Code\bookmarks\classified'
+
+    # 编码设置 - 一般保持为'utf-8'即可
+    ENCODING = 'utf-8'  # 修正了拼写错误
+
+    # 应用信息 - 用于显示在控制台标题
+    APP_NAME = "Chrome Bookmark Classifier"
+    APP_VERSION = "v2.0"
+    APP_DESCRIPTION = "Chrome书签智能分类工具"
+```
+
+### 修改配置
+
+1. **改变输入文件**: 修改 `INPUT_FILE` 的值
+   ```python
+   INPUT_FILE = r'C:\你的路径\你的书签文件.html'
+   ```
+
+2. **改变输出目录**: 修改 `OUTPUT_DIR` 的值
+   ```python
+   OUTPUT_DIR = r'C:\你的输出目录'
+   ```
+
+### 配置类方法
+
+- `ensure_output_dir()`: 确保输出目录存在
+- `get_app_info()`: 获取应用显示信息
+- `get_input_file_display()`: 获取输入文件显示路径
+- `get_output_dir_display()`: 获取输出目录显示路径
+
+### 配置优势
+
+1. **集中管理**: 所有配置在一个地方，避免硬编码
+2. **易于修改**: 不需要修改主代码文件，只需修改配置类
+3. **类型安全**: 使用类属性，避免字符串错误
+4. **可扩展**: 可以轻松添加新的配置项
+5. **路径处理**: 使用原始字符串避免转义字符问题
+
+### 注意事项
+
+- 路径前面的 `r` 表示原始字符串，避免转义字符问题
+- 确保路径存在，否则会报错
+- Windows和Unix路径格式都支持
+- 编码参数现在是 `encoding=Config.ENCODING`（修正了拼写错误）
+
 ## 技术细节
 
 - **Python版本**: Python 3.x
