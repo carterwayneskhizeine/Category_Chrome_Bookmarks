@@ -39,7 +39,7 @@ python bookmark_classifier.py
 ```
 
 脚本会：
-- 读取 `D:\Code\bookmarks\bookmarks25.html`
+- 读取 `D:\Code\bookmarks\bookmarks.html`
 - 解析所有书签
 - 按照智能分类整理
 - 在 `D:\Code\bookmarks\classified\` 目录下生成HTML文件
