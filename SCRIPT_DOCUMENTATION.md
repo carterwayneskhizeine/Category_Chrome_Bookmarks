@@ -75,64 +75,59 @@ for bookmark in bookmarks[:3]:
 
 **功能**: 对书签进行智能分类
 
-#### 分类规则定义
+#### 分类规则定义 (v2.0更新)
 
 ```python
 CATEGORIES = {
-    'Category Name': {
-        'keywords': [list of keywords],      # 关键词列表
-        'folder_keywords': [list of keywords] # 文件夹关键词列表
-    }
+    'Category Name': [list of keywords]  # 简化的关键词列表
 }
 ```
 
 #### 预定义分类
 
-| 分类 | 主要关键词 | 文件夹关键词 |
-|------|-----------|-----------|
-| Programming | github, stackoverflow, coding, python, javascript, java, ... | code, programming, dev, tech, tutorial |
-| Unreal Engine | unreal, ue4, ue5, unrealengine, marketplace, blueprint, ... | unreal, ue, game |
-| Forum | forum, bbs, community, discussion, creaders, ... | forum, community, 论坛 |
-| Youtube | youtube, youtu.be, video, bilibili, vimeo, twitch, ... | youtube, video, 视频 |
-| Jobs | boss, zhipin, job, career, linkedin, indeed, ... | job, career, 招聘, boss |
-| Music | music, spotify, soundcloud, netease, qq music, ... | music, 音乐 |
-| Design | behance, dribbble, design, artstation, ui, ux, ... | design, art, 设计 |
-| Shopping | amazon, ebay, taobao, jd, tmall, aliexpress, ... | shopping, shop, 购物 |
-| News | news, bbc, cnn, reuters, nytimes, techcrunch, ... | news, 新闻 |
-| Social Media | facebook, twitter, instagram, weibo, wechat, tiktok, ... | social, 社交 |
+| 分类 | 主要关键词 |
+|------|-----------|
+| Programming | github, stackoverflow, coding, programming, python, javascript, java, code, developer, api, git, csdn, blog, tech, tutorial, documentation, docs, dev, npm, jquery, react, vue, angular, node, typescript, html, css, web development, coding, programmer, leetcode, hackerrank, codewars |
+| Unreal Engine | unreal, ue4, ue5, unrealengine, marketplace, epic games, blueprint, nanite, lumen, metahuman, houdini |
+| Forum | forum, bbs, community, discussion, creaders, weiming, pincong, reddit, discord, slack, 论坛, 社区, 讨论, avalon, projectavalon |
+| Youtube | youtube, youtu.be, video, bilibili, vimeo, twitch, xinpianchang, 新片场, 视频 |
+| Jobs | boss, zhipin, job, career, hiring, recruitment, linkedin, indeed, glassdoor, 招聘, lagou, 拉勾, 智联, 前程无忧 |
+| Music | music, spotify, soundcloud, bandcamp, apple music, youtube music, netease, qq music, 音乐, song, artist, album, playlist |
+| Design | behance, dribbble, design, artstation, deviantart, pinterest, figma, sketch, adobe, photoshop, illustrator, ui, ux, graphic design, 设计, designboom, gfxdomain, art |
+| Shopping | amazon, ebay, taobao, jd, tmall, aliexpress, shopping, shop, buy, purchase, 淘宝, 京东, 天猫, 购物 |
+| News | news, bbc, cnn, reuters, nytimes, guardian, techcrunch, hacker news, 新闻, xinhua, sina, sohu |
+| Social Media | facebook, twitter, x.com, instagram, weibo, wechat, tiktok, social, 微博, 微信, 社交 |
+
+**重要变更**: v2.0版本已移除文件夹关键词支持，分类仅基于URL和书签名称的关键词匹配。
 
 #### 关键方法
 
-**classify_bookmark(bookmark) -> str**
+**classify_bookmark(bookmark) -> str** (v2.0更新)
 ```python
 """
-根据单个书签的URL、名称和文件夹路径进行分类
+根据单个书签的URL和名称进行分类（不再使用文件夹路径）
 参数:
     bookmark: Dict - 包含url, name, folder_path的字典
 返回:
     str - 分类名称，或'Other'
 """
 def classify_bookmark(self, bookmark):
-    # 1. 提取并转换为小写
+    # 1. 提取并转换为小写（仅URL和名称）
     url_lower = bookmark['url'].lower()
     name_lower = bookmark['name'].lower()
-    folder_path = ' '.join(bookmark['folder_path']).lower()
-    search_text = f"{url_lower} {name_lower} {folder_path}"
+    search_text = f"{url_lower} {name_lower}"
 
-    # 2. 计算每个分类的得分
-    scores = {}
-    for category, rules in self.CATEGORIES.items():
-        for keyword in rules['keywords']:
+    # 2. 计算每个分类的得分（简化版）
+    scores = defaultdict(int)
+    for category, keywords in self.CATEGORIES.items():
+        for keyword in keywords:
             if keyword.lower() in search_text:
-                scores[category] += 2  # URL/名称权重: 2
-
-        for keyword in rules['folder_keywords']:
-            if keyword.lower() in folder_path:
-                scores[category] += 1  # 文件夹权重: 1
+                scores[category] += 1  # 统一权重: 1
 
     # 3. 返回最高得分的分类
     if scores:
-        return max(scores.items(), key=lambda x: x[1])[0]
+        best_category = max(scores.items(), key=lambda x: x[1])[0]
+        return best_category
     return 'Other'
 ```
 
@@ -181,20 +176,25 @@ for bookmark in programming_bookmarks:
 """
 ```
 
-生成的HTML格式:
+生成的HTML格式 (v2.0更新):
 ```html
 <!DOCTYPE NETSCAPE-Bookmark-file-1>
-<!-- Chrome兼容格式 -->
+<!-- Chrome兼容格式 - 完全符合Chrome导入标准 -->
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<TITLE>编程 - Bookmarks</TITLE>
-<H1>编程 - Bookmarks</H1>
-<DL><p>
-    <DT><H3>文件夹名称</H3>
+<TITLE>Bookmarks</TITLE>
+<H1>Bookmarks</H1>
+<DL>
+    <DT><H3 ADD_DATE="timestamp" LAST_MODIFIED="timestamp">分类名称</H3>
     <DL><p>
-        <DT><A HREF="url" ADD_DATE="timestamp" ICON="base64">书签标题</A>
+        <DT><A HREF="url" ADD_DATE="timestamp">书签标题</A>
     </DL><p>
 </DL><p>
 ```
+
+**重要变更**:
+- ✅ **移除ICON属性** - 解决Chrome导入失败问题
+- ✅ **标准化格式** - 完全符合Chrome书签导出格式
+- ✅ **保留原始结构** - 不再保留原始文件夹层次，直接分类列出
 
 **generate_index_html(categories, output_file)**
 ```python
@@ -302,7 +302,7 @@ def main():
 
 ## 自定义分类
 
-### 添加新分类
+### 添加新分类 (v2.0格式)
 
 ```python
 # 修改 BookmarkClassifier 类中的 CATEGORIES
@@ -310,39 +310,50 @@ def main():
 CATEGORIES = {
     # ... 现有分类 ...
 
-    'Gaming': {
-        'keywords': [
-            'steam', 'epic games', 'game', 'gaming',
-            'twitch', 'discord', 'valve', 'playstation'
-        ],
-        'folder_keywords': ['game', 'gaming', '游戏']
-    },
+    'Gaming': [
+        'steam', 'epic games', 'game', 'gaming',
+        'twitch', 'discord', 'valve', 'playstation',
+        'xbox', 'nintendo', 'battlefield', 'call of duty'
+    ],
 
-    'Cryptocurrency': {
-        'keywords': [
-            'bitcoin', 'ethereum', 'crypto', 'blockchain',
-            'coinbase', 'kraken', 'defi', 'nft'
-        ],
-        'folder_keywords': ['crypto', 'blockchain', '加密']
-    }
+    'Cryptocurrency': [
+        'bitcoin', 'ethereum', 'crypto', 'blockchain',
+        'coinbase', 'kraken', 'defi', 'nft',
+        'binance', 'coinmarketcap', 'web3', 'dao'
+    ],
+
+    'AI/ML': [
+        'openai', 'chatgpt', 'gpt', 'claude', 'artificial intelligence',
+        'machine learning', 'deep learning', 'neural network', 'tensorflow',
+        'pytorch', 'huggingface', 'kaggle', 'ai', 'ml'
+    ]
 }
 ```
 
-### 调整关键词权重
+### 调整关键词权重 (v2.0简化)
+
+v2.0版本已简化权重系统，现在所有关键词权重均为1。如需调整权重，可修改为：
 
 ```python
 # 修改 classify_bookmark 方法
 
 def classify_bookmark(self, bookmark):
     # ...
-    for keyword in rules['keywords']:
+    for keyword in keywords:
         if keyword.lower() in search_text:
-            scores[category] += 3  # 改为3
-
-    for keyword in rules['folder_keywords']:
-        if keyword.lower() in folder_path:
-            scores[category] += 2  # 改为2
+            scores[category] += 1  # 统一权重
     # ...
+```
+
+如需实现不同权重，可以扩展为：
+```python
+WEIGHTED_KEYWORDS = {
+    'Programming': {
+        'github': 3,      # 高权重
+        'stackoverflow': 2, # 中权重
+        'blog': 1         # 低权重
+    }
+}
 ```
 
 ## 性能优化技巧
@@ -523,12 +534,41 @@ def generate_report(classified):
     return '\n'.join(report)
 ```
 
+## 版本历史
+
+### v2.0 - Chrome兼容性改进 (当前版本)
+**主要变更**:
+- ✅ **移除文件夹关键词匹配** - 简化分类逻辑，仅基于URL和书签名称
+- ✅ **移除ICON属性** - 解决Chrome书签导入失败问题
+- ✅ **标准化HTML格式** - 完全符合Chrome书签导出格式要求
+- ✅ **简化分类系统** - 从嵌套字典结构改为简单列表结构
+- ✅ **优化分类准确性** - 基于实际测试调整关键词
+
+**技术改进**:
+- CATEGORIES结构从 `{category: {keywords: [], folder_keywords: []}}` 改为 `{category: []}`
+- classify_bookmark方法移除文件夹路径检查
+- HTMLGenerator不再生成ICON属性
+- 添加时间戳属性到H3标签
+
+### v1.0 - 初始版本
+**功能特性**:
+- 基础Chrome书签HTML解析
+- 基于关键词和文件夹路径的双重分类
+- 保留原始文件夹层次结构
+- 现代化HTML索引页面生成
+- Base64图标数据保留
+
+**已知问题**:
+- Chrome导入兼容性问题（ICON属性导致）
+- 文件夹关键词匹配过于复杂
+- 分类准确性有待提高
+
 ## 总结
 
 该脚本提供了一个完整的书签处理解决方案，包括:
 - 高效的HTML解析
-- 灵活的分类系统
-- 专业的HTML生成
+- 简化而准确的分类系统
+- 完全Chrome兼容的HTML生成
 - 易于扩展的架构
 
-可根据需要进行定制和扩展，以满足更复杂的需求。
+v2.0版本通过移除复杂功能和改进Chrome兼容性，使工具更加实用和可靠。可根据需要进行定制和扩展，以满足更复杂的需求。

@@ -83,88 +83,175 @@ class BookmarkParser(HTMLParser):
 
         elif self.current_link is not None:
             self.current_link['name'] = data
-
-
+   
 class BookmarkClassifier:
-    """书签智能分类器"""
+    """书签智能分类器（极客 / AI / 编程 技术向重构版）"""
 
     # 定义分类规则（关键词匹配）
     CATEGORIES = {
-        'Programming': {
-            'keywords': [
-                'github', 'stackoverflow', 'coding', 'programming', 'python', 'javascript',
-                'java', 'code', 'developer', 'api', 'git', 'csdn', 'blog', 'tech',
-                'tutorial', 'documentation', 'docs', 'dev', 'npm', 'jquery', 'react',
-                'vue', 'angular', 'node', 'typescript', 'html', 'css', 'web development',
-                'coding', 'programmer', 'leetcode', 'hackerrank', 'codewars'
-            ],
-            'folder_keywords': ['code', 'programming', 'dev', 'tech', 'tutorial']
-        },
-        'Unreal Engine': {
-            'keywords': [
-                'unreal', 'ue4', 'ue5', 'unrealengine', 'marketplace', 'epic games',
-                'blueprint', 'nanite', 'lumen', 'metahuman', 'houdini'
-            ],
-            'folder_keywords': ['unreal', 'ue', 'game']
-        },
-        'Forum': {
-            'keywords': [
-                'forum', 'bbs', 'community', 'discussion', 'creaders', 'weiming',
-                'pincong', 'reddit', 'discord', 'slack', '论坛', '社区', '讨论',
-                'avalon', 'projectavalon'
-            ],
-            'folder_keywords': ['forum', 'community', '论坛']
-        },
-        'Youtube': {
-            'keywords': [
-                'youtube', 'youtu.be', 'video', 'bilibili', 'vimeo', 'twitch',
-                'xinpianchang', '新片场', '视频'
-            ],
-            'folder_keywords': ['youtube', 'video', '视频']
-        },
-        'Jobs': {
-            'keywords': [
-                'boss', 'zhipin', 'job', 'career', 'hiring', 'recruitment', 'linkedin',
-                'indeed', 'glassdoor', '招聘', 'lagou', '拉勾', '智联', '前程无忧'
-            ],
-            'folder_keywords': ['job', 'career', '招聘', 'boss']
-        },
-        'Music': {
-            'keywords': [
-                'music', 'spotify', 'soundcloud', 'bandcamp', 'apple music', 'youtube music',
-                'netease', 'qq music', '音乐', 'song', 'artist', 'album', 'playlist'
-            ],
-            'folder_keywords': ['music', '音乐']
-        },
-        'Design': {
-            'keywords': [
-                'behance', 'dribbble', 'design', 'artstation', 'deviantart', 'pinterest',
-                'figma', 'sketch', 'adobe', 'photoshop', 'illustrator', 'ui', 'ux',
-                'graphic design', '设计', 'designboom', 'gfxdomain', 'art'
-            ],
-            'folder_keywords': ['design', 'art', '设计']
-        },
-        'Shopping': {
-            'keywords': [
-                'amazon', 'ebay', 'taobao', 'jd', 'tmall', 'aliexpress', 'shopping',
-                'shop', 'buy', 'purchase', '淘宝', '京东', '天猫', '购物'
-            ],
-            'folder_keywords': ['shopping', 'shop', '购物']
-        },
-        'News': {
-            'keywords': [
-                'news', 'bbc', 'cnn', 'reuters', 'nytimes', 'guardian', 'techcrunch',
-                'hacker news', '新闻', 'xinhua', 'sina', 'sohu'
-            ],
-            'folder_keywords': ['news', '新闻']
-        },
-        'Social Media': {
-            'keywords': [
-                'facebook', 'twitter', 'instagram', 'weibo', 'wechat', 'tiktok',
-                'social', '微博', '微信', '社交'
-            ],
-            'folder_keywords': ['social', '社交']
-        }
+        # 1. AI / Machine Learning 核心
+        'AI/ML': [
+            'openai', 'chatgpt', 'gpt', 'claude', 'copilot',
+            'artificial intelligence', 'machine learning', 'deep learning',
+            'neural network', 'llm', 'tensorflow', 'pytorch', 'huggingface',
+            'kaggle', 'fastai', 'stability.ai', 'midjourney',
+            'replicate', 'vertex ai', 'bedrock', 'anthropic',
+            'ai', 'ml'
+        ],
+
+        # 2. 核心编程 / 开发
+        'Programming': [
+            # 平台 & 托管
+            'github', 'gitlab', 'bitbucket', 'gitee',
+            # 通用编程关键词
+            'coding', 'programming', 'developer', 'dev', 'software engineer',
+            'code', 'refactor', 'algorithm', 'data structure',
+            'design pattern', 'oop', 'functional programming',
+            # 中文技术社区
+            'csdn', '掘金', 'segmentfault', 'v2ex', '博客园',
+            # 学习/文档
+            'tutorial', 'documentation', 'docs', 'cookbook',
+            'roadmap.sh', 'w3schools', 'geeksforgeeks'
+        ],
+
+        # 3. Python 生态
+        'Python': [
+            'python', 'pypi', 'pip', 'conda', 'anaconda',
+            'jupyter', 'notebook', 'ipython',
+            'django', 'flask', 'fastapi', 'tornado',
+            'scrapy', 'pytest', 'pydantic'
+        ],
+
+        # 4. JavaScript / TypeScript / Web / Electron / Vue
+        'Web & JS': [
+            'javascript', 'typescript', 'node', 'node.js', 'nodejs',
+            'npm', 'yarn', 'pnpm',
+            'vue', 'nuxt', 'react', 'next.js', 'angular', 'svelte',
+            'webpack', 'vite', 'rollup', 'babel',
+            'html', 'css', 'sass', 'less', 'tailwind',
+            'electron', 'web development', 'frontend', '前端'
+        ],
+
+        # 5. C / C++ / 系统底层
+        'C/C++ & Systems': [
+            'c++', 'cppreference', 'isocpp', 'boost',
+            'cmake', 'meson', 'ninja',
+            'clang', 'gcc', 'msvc',
+            'gdb', 'lldb',
+            'address sanitizer', 'valgrind',
+            'embedded', 'rtos', 'system programming',
+            '低级编程', '系统编程'
+        ],
+
+        # 6. Unreal Engine / 游戏开发技术
+        'Unreal Engine & Game Dev': [
+            'unreal', 'unreal engine', 'ue4', 'ue5', 'unrealengine',
+            'epic games', 'marketplace', 'metahuman',
+            'blueprint', 'nanite', 'lumen', 'gameplay ability system',
+            '虚幻引擎', 'ue 文档', 'ue marketplace',
+            # 通用游戏开发
+            'game dev', 'gamedev', 'unity3d', 'unity',
+            'shader', 'hlsl', 'glsl', 'rendering', 'vulkan', 'directx'
+        ],
+
+        # 7. Linux / DevOps / 云 / 工具链
+        'Linux & DevOps': [
+            'linux', 'ubuntu', 'debian', 'archlinux', 'fedora', 'centos',
+            'manjaro', 'wsl',
+            'bash', 'zsh', 'shell', 'terminal',
+            'docker', 'kubernetes', 'k8s', 'helm',
+            'ansible', 'terraform',
+            'jenkins', 'gitlab ci', 'github actions',
+            'nginx', 'apache', '容器', '运维', 'devops'
+        ],
+
+        # 8. 硬核工具 / 效率 / 极客资源
+        'Tools & Productivity': [
+            'vim', 'neovim', 'emacs', 'vscode', 'intellij', 'clion', 'pycharm',
+            'postman', 'insomnia',
+            'regex', 'regex101',
+            'obsidian', 'notion',
+            'productivity', 'todoist'
+        ],
+
+        # 9. 技术社区 / 讨论区
+        'Tech Communities': [
+            'stackoverflow', 'stack overflow',
+            'reddit', 'hacker news', 'lobste.rs',
+            'discord', 'slack', 'telegram',
+            '论坛', '社区', 'discussion', 'community',
+            'v2ex', 'pincong', 'projectavalon', 'weiming', 'creaders'
+        ],
+
+        # 10. 文档 / 官方资源（可作为更精细层）
+        'Docs & Specs': [
+            'rfc-editor.org', 'w3c', 'whatwg',
+            'man7.org', 'mdn web docs', 'developer.mozilla.org',
+            'specification', 'spec', 'api reference'
+        ],
+
+        # 11. Gaming（玩家 & 平台向）
+        'Gaming': [
+            'steam', 'epic games', 'gog', 'uplay', 'ea app',
+            'playstation', 'psn', 'xbox', 'nintendo', 'switch',
+            'battle.net', 'riot games',
+            'twitch', 'discord',  # 如果你更希望归到社区，可在逻辑中设优先级
+            'game', 'gaming', 'league of legends',
+            'dota', 'counter-strike', 'csgo', 'call of duty', 'battlefield'
+        ],
+
+        # 12. Cryptocurrency / Web3
+        'Cryptocurrency': [
+            'bitcoin', 'btc', 'ethereum', 'eth',
+            'crypto', 'cryptocurrency', 'blockchain',
+            'defi', 'nft', 'dao', 'web3',
+            'binance', 'coinbase', 'kraken', 'okx',
+            'uniswap', 'metamask', 'coinmarketcap', 'coingecko'
+        ],
+
+        # 13. 视频 / 教学 / 资源
+        'Video & Learning': [
+            'youtube', 'youtu.be', 'bilibili', 'vimeo',
+            'coursera', 'edx', 'udemy', 'pluralsight',
+            'xinpianchang', '新片场',
+            '视频教程', '课程', 'lecture'
+        ],
+
+        # 14. 设计 / UI / CG / 艺术（为技术服务）
+        'Design & Art': [
+            'behance', 'dribbble', 'artstation', 'deviantart',
+            'pinterest', '设计', 'ui', 'ux',
+            'figma', 'sketch', 'adobe', 'photoshop', 'illustrator',
+            'cg', '3d', 'blender', 'houdini'
+        ],
+
+        # 15. 技术新闻 / 极客资讯
+        'Tech News': [
+            'techcrunch', 'theverge', 'wired', 'arstechnica',
+            'phoronix', 'linux news',
+            '新闻', 'bbc', 'cnn', 'reuters', 'nytimes', 'guardian'
+        ],
+
+        # 16. 通用购物（放最后，避免误杀）
+        'Shopping': [
+            'amazon', 'ebay', 'taobao', 'jd', 'tmall',
+            'aliexpress', '购物', '买', 'shop', 'store', '京东', '天猫'
+        ],
+
+        # 17. 社交 / 非技术为主
+        'Social Media': [
+            'facebook', 'twitter', 'x.com', 'instagram', 'tiktok',
+            'weibo', '微博', 'wechat', '微信',
+            'social', '小红书', 'douyin'
+        ],
+
+        # 18. 工作 / 职业
+        'Jobs & Career': [
+            'boss', 'zhipin', 'lagou', '拉勾',
+            '智联', '前程无忧',
+            'linkedin', 'indeed', 'glassdoor',
+            'job', 'jobs', 'career', 'hiring', 'recruitment', '招聘'
+        ]
     }
 
     def __init__(self):
@@ -172,28 +259,22 @@ class BookmarkClassifier:
 
     def classify_bookmark(self, bookmark):
         """
-        根据URL、书签名称和文件夹路径对书签进行分类
+        根据URL和书签名称对书签进行分类（不再使用文件夹关键词）
         """
         url_lower = bookmark['url'].lower()
         name_lower = bookmark['name'].lower()
-        folder_path = ' '.join(bookmark['folder_path']).lower()
 
-        # 组合搜索文本
-        search_text = f"{url_lower} {name_lower} {folder_path}"
+        # 组合搜索文本（只包含URL和名称）
+        search_text = f"{url_lower} {name_lower}"
 
         # 记录匹配分数
         scores = defaultdict(int)
 
         # 检查每个分类
-        for category, rules in self.CATEGORIES.items():
+        for category, keywords in self.CATEGORIES.items():
             # URL和名称关键词匹配
-            for keyword in rules['keywords']:
+            for keyword in keywords:
                 if keyword.lower() in search_text:
-                    scores[category] += 2  # URL/名称匹配权重更高
-
-            # 文件夹关键词匹配
-            for keyword in rules['folder_keywords']:
-                if keyword.lower() in folder_path:
                     scores[category] += 1
 
         # 返回得分最高的分类，如果没有匹配则返回 'Other'
@@ -216,39 +297,35 @@ class HTMLGenerator:
 
     @staticmethod
     def generate_category_html(category_name, bookmarks, output_file):
-        """为单个分类生成HTML文件"""
+        """为单个分类生成HTML文件（标准Chrome书签格式）"""
+        import time
+
+        # 生成时间戳
+        current_time = str(int(time.time()))
+
         html_content = f'''<!DOCTYPE NETSCAPE-Bookmark-file-1>
 <!-- This is an automatically generated file.
      It will be read and overwritten.
      DO NOT EDIT! -->
 <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=UTF-8">
-<TITLE>{category_name} - Bookmarks</TITLE>
-<H1>{category_name} - Bookmarks</H1>
-<DL><p>
+<TITLE>Bookmarks</TITLE>
+<H1>Bookmarks</H1>
+<DL>
+    <DT><H3 ADD_DATE="{current_time}" LAST_MODIFIED="{current_time}">{category_name}</H3>
+    <DL><p>
 '''
 
-        # 按文件夹组织书签
-        folders = defaultdict(list)
+        # 直接列出所有书签（不包含ICON以避免Chrome导入问题）
         for bookmark in bookmarks:
-            folder_key = ' > '.join(bookmark['folder_path']) if bookmark['folder_path'] else 'Root'
-            folders[folder_key].append(bookmark)
+            # 暂时不添加ICON属性，因为Chrome可能无法正确解析长的base64数据
+            # icon_attr = f' ICON="{bookmark["icon"]}"' if bookmark.get('icon') else ''
+            add_date_attr = f' ADD_DATE="{bookmark["add_date"]}"' if bookmark.get('add_date') else f' ADD_DATE="{current_time}"'
 
-        # 生成书签HTML
-        for folder_name, folder_bookmarks in sorted(folders.items()):
-            if folder_name != 'Root':
-                html_content += f'    <DT><H3>{folder_name}</H3>\n'
-                html_content += '    <DL><p>\n'
+            html_content += f'        <DT><A HREF="{bookmark["url"]}"{add_date_attr}>{bookmark["name"]}</A>\n'
 
-            for bookmark in folder_bookmarks:
-                icon_attr = f' ICON="{bookmark["icon"]}"' if bookmark.get('icon') else ''
-                add_date_attr = f' ADD_DATE="{bookmark["add_date"]}"' if bookmark.get('add_date') else ''
-
-                html_content += f'        <DT><A HREF="{bookmark["url"]}"{add_date_attr}{icon_attr}>{bookmark["name"]}</A>\n'
-
-            if folder_name != 'Root':
-                html_content += '    </DL><p>\n'
-
-        html_content += '</DL><p>\n'
+        html_content += '''    </DL><p>
+</DL><p>
+'''
 
         # 写入文件
         with open(output_file, 'w', encoding='utf-8') as f:
@@ -373,18 +450,26 @@ class HTMLGenerator:
         <div class="categories">
 '''
 
-        # 为每个分类添加图标
+        # 为每个分类添加图标（匹配新的分类名称）
         category_icons = {
+            'AI/ML': '🤖',
             'Programming': '💻',
-            'Unreal Engine': '🎮',
-            'Forum': '💬',
-            'Youtube': '🎥',
-            'Jobs': '💼',
-            'Music': '🎵',
-            'Design': '🎨',
+            'Python': '🐍',
+            'Web & JS': '🌐',
+            'C/C++ & Systems': '⚙️',
+            'Unreal Engine & Game Dev': '🎮',
+            'Linux & DevOps': '🐧',
+            'Tools & Productivity': '🛠️',
+            'Tech Communities': '💬',
+            'Docs & Specs': '📚',
+            'Gaming': '🎲',
+            'Cryptocurrency': '₿',
+            'Video & Learning': '🎥',
+            'Design & Art': '🎨',
+            'Tech News': '📰',
             'Shopping': '🛍️',
-            'News': '📰',
             'Social Media': '📱',
+            'Jobs & Career': '💼',
             'Other': '📂'
         }
 
@@ -399,7 +484,9 @@ class HTMLGenerator:
 
         for category_name, bookmarks in sorted_categories:
             icon = category_icons.get(category_name, '📁')
-            filename = category_name.lower().replace(' ', '_') + '.html'
+            # 使用相同的文件名转换逻辑确保一致性
+            safe_filename = category_name.lower().replace(' ', '_').replace('/', '_').replace('&', '_and_')
+            filename = safe_filename + '.html'
             count = len(bookmarks)
 
             html_content += f'''
@@ -476,7 +563,9 @@ def main():
 
     # 为每个分类生成HTML
     for category_name, bookmarks_list in classified_bookmarks.items():
-        filename = category_name.lower().replace(' ', '_') + '.html'
+        # 将分类名转换为安全的文件名（替换特殊字符）
+        safe_filename = category_name.lower().replace(' ', '_').replace('/', '_').replace('&', '_and_')
+        filename = safe_filename + '.html'
         output_file = os.path.join(output_dir, filename)
         generator.generate_category_html(category_name, bookmarks_list, output_file)
         print(f"      生成: {filename}")
