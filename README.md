@@ -2,7 +2,7 @@
 
 ## 项目简介
 
-这是一个Python脚本，用于解析Chrome导出的书签HTML文件，并根据URL和书签名称进行智能分类（已移除文件夹关键词匹配）。
+这是一个Python脚本，用于解析Chrome导出的书签HTML文件，并根据URL和书签名称进行智能分类。
 
 ## 功能特点
 
@@ -52,7 +52,7 @@ python bookmark_classifier.py
 
 ```
 D:\Code\bookmarks\
-├── bookmarks25.html              # 原始Chrome书签文件
+├── bookmarks.html              # 原始Chrome书签文件
 ├── bookmark_classifier.py         # 主分类脚本
 ├── test_parser.py                # 测试解析器（可选）
 ├── README.md                     # 本文件
@@ -117,7 +117,7 @@ CATEGORIES = {
 ```python
 class Config:
     # 输入文件路径 - 修改这里来改变要处理的Chrome书签文件
-    INPUT_FILE = r'D:\Code\bookmarks\bookmarks25.html'
+    INPUT_FILE = r'D:\Code\bookmarks\bookmarks.html'
 
     # 输出目录 - 修改这里来改变生成HTML文件的保存位置
     OUTPUT_DIR = r'D:\Code\bookmarks\classified'
